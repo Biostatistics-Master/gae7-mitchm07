@@ -1,6 +1,6 @@
 ---
 title: "GAE7"
-author: "Your Name Here"
+author: "Mitch Mullin"
 format: 
   html:
     theme: custom.scss
@@ -80,6 +80,139 @@ df1$Block <- factor(df1$Block)
 
 ### Statistical Methods
 
+In this statistical analysis, the data was represented by 9 spacio-temporal blocks (3 locations x 3 unique times when the data was collected) each represented by the "Block" row in the dataset. A linear model for multiple variables was created for each dependent variable using the lmer() function from the @lmerTest package. An ANOVA model was created for each variable using the anova() function found in the base R package, and the model was visualized on a table using the kbl() function found in the @kableExtra package. A table for random effects was also created using the rand() function found in the @lmerTest package, and was visualized on a table using the kbl() function.
+
 ## Results
+
+@tbl-cx-1 shows us the results of a fixed effect model for the *Culex* egg rafts, where the interactions between *Culex* egg rafts and the nutrient treatment (p = 0.043) as well as the interaction between egg rafts and the fish treatment (p = 0.002) are both statistically significant. The F-statistic for the interaction of egg rafts and fish is larger and the p-value is smaller, suggesting that the relation between the two is stronger. @tbl-cx-2 displays relatively high AIC values for both tests (p = 0.002), but it appears that treating the blocks as fixed may be a slightly better fit for the data. @tbl-hydro-1 shows the results of a fixed effect model for *hydrophilidae*, and none of the interactions were statistically significant. @tbl-hydro-2 displays relatively high AIC values for both tests (p \< 0.05), but it appears that treating the blocks as fixed may be a slightly better fit for the data. @tbl-dy-1 shows the results of a fixed effect model for *dytiscidae*, where the interactions between *dy*. and nutrient treatment (p = 0.026) as well as the interaction between *dy*. and fish treatment (p \< 0.05) are both statistically significant. The F-statistic for the interaction between *dy*. and fish is larger and the p-value is smaller, suggesting that the relation between the two is stronger. @tbl-dy-2 displays the relatively high AIC values for both tests (p \< 0.05), but it appears that treating the blocks as fixed may be a slightly better fit for the data.
+
+```{r}
+#| label: tbl-cx
+#| tbl-cap: "Linear mixed-effects model results for the dependent variable 'culex egg rafts' from data provided by @Pintar.etal2018."
+#| tbl-subcap:
+#|     - "Fixed effect."
+#|     - "Random effect."
+#| layout-nrows: 2
+
+#Run 3 separate tests for each dependent variable.
+#Run a linear model for culex egg rafts using the lmer function. Include (1|Block) to account for the block separation.
+  #lmer is specifically for linear mixed effect modeling. We use this since we're treating our blocks as a random factor.
+culexmod <- lmer(Culex_Egg_Rafts ~ Nutrient*Fish + (1|Block), data = df1)
+
+#Create an anova model for the dependent variable culex egg rafts, then output it to an Anova table to visualize the data.
+CulexAnova <- anova(culexmod)
+
+#Now I made a table for the ANOVA data (fixed effects), and a second table to represent the results for random effects.
+kbl(
+  CulexAnova,
+  col.names = c(
+    "SS",
+    "MS",
+    "df1",
+    "df2",
+    "F",
+    "P"
+    ),
+  digits = c(3,3,0,0,3,4)
+  ) |>
+  kable_classic()
+
+kbl(
+  rand(culexmod),
+  col.names = c(
+    "Parameters",
+    "log-likelihood",
+    "AIC",
+    "LRT",
+    "df",
+    "P"
+    ),
+  digits = c(0,3,3,3,0,4)
+  )
+
+#Keep in mind, two df (degrees of freedom) are output, because df1 shows the df for the # of parameters, and df2 shows the df for the residuals.
+```
+
+```{r}
+#| label: tbl-hydro
+#| tbl-cap: "Linear mixed-effects model results for the dependent variable 'hydrophilidae' from data provided by @Pintar.etal2018."
+#| tbl-subcap:
+#|     - "Fixed effect."
+#|     - "Random effect."
+#| layout-nrows: 2
+
+#In this code chunk I repeated the process in tbl-cx, but did it with the dependent variable hydrophilidae.
+hydromod <- lmer(Hydrophilidae ~ Nutrient*Fish + (1|Block), data = df1)
+
+HydroAnova <- anova(hydromod)
+
+kbl(
+  HydroAnova,
+  col.names = c(
+    "SS",
+    "MS",
+    "df1",
+    "df2",
+    "F",
+    "P"
+    ),
+  digits = c(3,3,0,0,3,4)
+  ) |>
+  kable_classic()
+
+kbl(
+  rand(hydromod),
+  col.names = c(
+    "Parameters",
+    "log-likelihood",
+    "AIC",
+    "LRT",
+    "df",
+    "P"
+    ),
+  digits = c(0,3,3,3,0,4)
+  )
+```
+
+```{r}
+#| label: tbl-dy
+#| tbl-cap: "Linear mixed-effects model results for the dependent variable 'dytiscidae' from data provided by @Pintar.etal2018."
+#| tbl-subcap:
+#|     - "Fixed effect."
+#|     - "Random effect."
+#| layout-nrows: 2
+
+#In this code chunk I repeated the process in tbl-cx, but did it with the dependent variable dytiscidae.
+dymod <- lmer(Dytiscidae ~ Nutrient*Fish + (1|Block), data = df1)
+
+DyAnova <- anova(dymod)
+
+kbl(
+  DyAnova,
+  col.names = c(
+    "SS",
+    "MS",
+    "df1",
+    "df2",
+    "F",
+    "P"
+    ),
+  digits = c(3,3,0,0,3,4)
+  ) |>
+  kable_classic()
+
+kbl(
+  rand(dymod),
+  col.names = c(
+    "Parameters",
+    "log-likelihood",
+    "AIC",
+    "LRT",
+    "df",
+    "P"
+    ),
+  digits = c(0,3,3,3,0,4)
+  )
+```
 
 ## References
